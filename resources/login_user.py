@@ -1,6 +1,8 @@
 from flask import request
 from flask_restful import Resource
 
+from db_utils.database_interface import Database
+
 class LoginUser(Resource):
     def post(self):
         args = request.args
