@@ -14,7 +14,7 @@ class Encryption():
             data.encode("utf-8"),
             salt,
             100_000
-        )
+        ).hex()
 
         return hash
 

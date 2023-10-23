@@ -1,16 +1,26 @@
 from flask import request
 from flask_restful import Resource
 import jwt
+from datetime import datetime, timedelta
 
+from resources.verify_request import VerifyRequest
 from config import Config
 
 class AuthenticateToken(Resource):
+    def __init__(self):
+        self.requiredHeaders = ["username", "ip", "port"]
+        self.requiredArgs = ["token"]
+
     def post(self):
-        headers = request.headers
-        if len(headers) < 2 or "token" not in headers or "username" not in headers:
-            return "incorrect headers", 400
-        givenUsername = headers.get("username")
-        token = headers.get("token")
+        isValidRequest = VerifyRequest.is_valid_request(
+            request, 
+            requiredHeaders=self.requiredHeaders, 
+            requiredArgs=self.requiredArgs
+        )
+        if not isValidRequest:
+            return "invalid request", 400
+        
+        token = request.args.get("token")
 
         try:
             data = jwt.decode(
@@ -19,9 +29,17 @@ class AuthenticateToken(Resource):
                 key=Config.JWT_SECRET
             )
 
-            if givenUsername != data["username"]:
-                return "invalid token", 401
+            currTime = datetime.now()
+            tokenTime = datetime.strptime(data["expiryTime"], "%Y-%m-%d %H:%M:%S")
+            if (tokenTime - currTime).total_seconds() <= 0:
+                return "token is expired", 401
+            
+            for field in data:
+                if field == "expiryTime":
+                    continue
+                elif data[field] != request.headers[field]:
+                    return "user credentials does not match with token", 401
 
             return 200
-        except Exception as e:
-            return str(e), 401
+        except Exception:
+            return "invalid token", 401
