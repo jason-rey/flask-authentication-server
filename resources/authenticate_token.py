@@ -9,18 +9,19 @@ from config import Config
 class AuthenticateToken(Resource):
     def __init__(self):
         self.requiredHeaders = ["username", "ip", "port"]
-        self.requiredArgs = ["token"]
+        self.requiredBodyFields = ["token"]
 
     def post(self):
         isValidRequest = VerifyRequest.is_valid_request(
             request, 
+            expectedContentType="application/json",
             requiredHeaders=self.requiredHeaders, 
-            requiredArgs=self.requiredArgs
+            requiredBodyFields=self.requiredBodyFields
         )
         if not isValidRequest:
             return "invalid request", 400
         
-        token = request.args.get("token")
+        token = request.json["token"]
 
         try:
             data = jwt.decode(

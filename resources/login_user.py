@@ -11,20 +11,21 @@ from config import Config
 class LoginUser(Resource):
     def __init__(self, _db: Database):
         self.db = _db
-        self.requiredArgs = ["username", "password"]
         self.requiredHeaders = ["ip", "port"]
+        self.requiredBodyFields = ["username", "password"]
 
     def post(self):
         isValidRequest = VerifyRequest.is_valid_request(
             request, 
-            requiredArgs=self.requiredArgs, 
-            requiredHeaders=self.requiredHeaders
+            expectedContentType="application/json",
+            requiredHeaders=self.requiredHeaders,
+            requiredBodyFields=self.requiredBodyFields
         )
         if not isValidRequest:
             return "incorrect parameters", 400
-        
-        username = request.args["username"]
-        password = request.args["password"]
+
+        username = request.json["username"]
+        password = request.json["password"]
         
         if not self.db.does_username_exist(username):
             return "incorrect username and/or password", 401

@@ -13,7 +13,7 @@ def main():
     
     api.add_resource(resources.RegisterUser, "/register-user", resource_class_args={db})
     api.add_resource(resources.LoginUser, "/login-user",  resource_class_args={db})
-    api.add_resource(resources.GetUsers, "/get-users", resource_class_args={db})
+    api.add_resource(resources.GetUsers, "/get-users", resource_class_args={db}) # testing endpoint, dont forget to remove later
     api.add_resource(resources.AuthenticateToken, "/authenticate-token")
     app.run(debug=True)
 
