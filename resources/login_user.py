@@ -11,36 +11,43 @@ from config import Config
 class LoginUser(Resource):
     def __init__(self, _db: Database):
         self.db = _db
-        self.requiredHeaders = ["ip", "port"]
         self.requiredBodyFields = ["username", "password"]
+        self.responseHeaders = {"Access-Control-Allow-Origin": Config.ALLOWED_ORIGIN}
+        self.optionsHeaders = {
+            "Access-Control-Allow-Origin": Config.ALLOWED_ORIGIN,
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "POST"
+        }
 
+    def options(self):
+        return 200, self.optionsHeaders
+    
     def post(self):
         isValidRequest = VerifyRequest.is_valid_request(
-            request, 
+            request,
             expectedContentType="application/json",
-            requiredHeaders=self.requiredHeaders,
             requiredBodyFields=self.requiredBodyFields
         )
         if not isValidRequest:
-            return "incorrect parameters", 400
+            return {"message": "incorrect parameters"}, 400, self.responseHeaders
 
         username = request.json["username"]
         password = request.json["password"]
         
         if not self.db.does_username_exist(username):
-            return "incorrect username and/or password", 401
+            return {"message": "incorrect username and/or password"}, 401, self.responseHeaders
         
         userData = self.db.get_user_data(username)
         givenHash = Encryption.hash_with_salt(password, userData["salt"])
 
         if givenHash != userData["hash"]:
-            return "incorrect username and/or password", 401
+            return {"message": "incorrect username and/or password"}, 401, self.responseHeaders
 
         tokenHoursToLive = 1
         expiryTimeStamp = datetime.now() + timedelta(hours=tokenHoursToLive)
         format = "%Y-%m-%d %H:%M:%S" 
-        ip = request.headers["ip"]
-        port = request.headers["port"]
+        ip = request.remote_addr
+        port = request.environ["REMOTE_PORT"]
         data = {
             "username": username,
             "ip": ip,
@@ -52,5 +59,5 @@ class LoginUser(Resource):
             payload=data,
             key=Config.JWT_SECRET
         )
-
-        return token
+        
+        return {"token": token}, 200, self.responseHeaders

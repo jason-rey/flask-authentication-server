@@ -8,8 +8,19 @@ from config import Config
 
 class AuthenticateToken(Resource):
     def __init__(self):
-        self.requiredHeaders = ["username", "ip", "port"]
+        self.requiredHeaders = ["username"]
         self.requiredBodyFields = ["token"]
+        self.responseHeaders = {
+            "Access-Control-Allow-Origin": Config.ALLOWED_ORIGIN
+        }
+        self.optionsHeaders = {
+            "Access-Control-Allow-Origin": Config.ALLOWED_ORIGIN,
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "POST"
+        }
+
+    def options(self):
+        return {}, 200, self.optionsHeaders
 
     def post(self):
         isValidRequest = VerifyRequest.is_valid_request(
@@ -19,7 +30,7 @@ class AuthenticateToken(Resource):
             requiredBodyFields=self.requiredBodyFields
         )
         if not isValidRequest:
-            return "invalid request", 400
+            return {"message": "invalid request"}, 400, self.responseHeaders
         
         token = request.json["token"]
 
@@ -33,14 +44,19 @@ class AuthenticateToken(Resource):
             currTime = datetime.now()
             tokenTime = datetime.strptime(data["expiryTime"], "%Y-%m-%d %H:%M:%S")
             if (tokenTime - currTime).total_seconds() <= 0:
-                return "token is expired", 401
-            
+                return {"message": "token is expired"}, 401, self.responseHeaders
+
+            userCredentials = {
+                "username": request.headers["username"],
+                "ip": request.remote_addr,
+                "port": request.environ["REMOTE_PORT"]
+            }
             for field in data:
                 if field == "expiryTime":
                     continue
-                elif data[field] != request.headers[field]:
-                    return "user credentials does not match with token", 401
+                elif data[field] != userCredentials[field]:
+                    return {"message": "user credentials does not match with token"}, 401, self.responseHeaders
 
-            return 200
+            return {}, 200, self.responseHeaders
         except Exception:
-            return "invalid token", 401
+            return {"message": "incorrect token"}, 401, self.responseHeaders
