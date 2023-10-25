@@ -1,6 +1,4 @@
 from flask_restful import Resource
-from flask import Response
-import json
 
 from db_utils.database_interface import Database
 from config import Config

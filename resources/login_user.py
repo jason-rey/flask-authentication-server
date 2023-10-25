@@ -1,5 +1,4 @@
 from flask import request
-from flask import make_response
 from flask_restful import Resource
 import jwt
 from datetime import datetime, timedelta

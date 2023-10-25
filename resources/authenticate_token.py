@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from resources.verify_request import VerifyRequest
 from config import Config
