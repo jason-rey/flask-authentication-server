@@ -1,4 +1,5 @@
 from flask import request
+from flask import make_response
 from flask_restful import Resource
 import jwt
 from datetime import datetime, timedelta
@@ -20,7 +21,7 @@ class LoginUser(Resource):
         }
 
     def options(self):
-        return 200, self.optionsHeaders
+        return {}, 200, self.optionsHeaders
     
     def post(self):
         isValidRequest = VerifyRequest.is_valid_request(
@@ -47,11 +48,9 @@ class LoginUser(Resource):
         expiryTimeStamp = datetime.now() + timedelta(hours=tokenHoursToLive)
         format = "%Y-%m-%d %H:%M:%S" 
         ip = request.remote_addr
-        port = request.environ["REMOTE_PORT"]
         data = {
             "username": username,
             "ip": ip,
-            "port": port,
             "expiryTime": expiryTimeStamp.strftime(format)
         }
 
