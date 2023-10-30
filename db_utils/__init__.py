@@ -1,2 +1,2 @@
-from db_utils import database_interface
-from db_utils import SQLdatabase
+from . import database_interface
+from . import MySQLdatabase

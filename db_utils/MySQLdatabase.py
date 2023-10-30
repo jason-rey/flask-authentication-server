@@ -1,18 +1,32 @@
 import mysql.connector
 
-from db_utils.database_interface import Database
+from . import database_interface
 from config import Config
 
-class SQL(Database):
+class MySQL(database_interface.Database):
     def __init__(self):
         self.db = mysql.connector.connect(
-            host = "localhost",
+            host = Config.DB_HOST,
             user = Config.DB_USER,
             password = Config.DB_PWD,
-            database = Config.DB_NAME
         )
         self.cursor = self.db.cursor()
     
+    def make_all(self):
+        try:
+            self.cursor.execute(f"CREATE DATABASE {Config.DB_NAME}")
+        except:
+            print("Database already exists")
+        
+        try:
+            self.cursor.execute("CREATE TABLE user_data (username VARCHAR(30), hash VARCHAR(64), salt VARCHAR(64))")
+        except:
+            print("Tables already exist")
+
+        print("Finished making")
+        self.db.database = Config.DB_NAME
+        self.db.commit()
+
     def get_user_data(self, username):
         self.cursor.execute(f'SELECT * FROM user_data WHERE username = "{username}"')
         result = self.cursor.fetchall()[0]

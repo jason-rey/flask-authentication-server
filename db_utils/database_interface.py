@@ -2,6 +2,9 @@ class Database():
     def __init__(self):
         raise Exception("constructor not implemented")
 
+    def make_all(self):
+        raise Exception("interface method make_all not implemented")
+
     def get_user_data(self, username):
         raise Exception("interface method get_user_data not implemented")
 
