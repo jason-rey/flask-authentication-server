@@ -4,52 +4,78 @@ from . import database_interface
 from config import Config
 
 class MySQL(database_interface.Database):
-    def __init__(self):
-        self.db = mysql.connector.connect(
+    def connect(self):
+        db = mysql.connector.connect(
+            host = Config.DB_HOST,
+            user = Config.DB_USER,
+            password = Config.DB_PWD,
+            database = Config.DB_NAME
+        )
+
+        return db, db.cursor()
+
+    def make_all(self):
+        db = mysql.connector.connect(
             host = Config.DB_HOST,
             user = Config.DB_USER,
             password = Config.DB_PWD,
         )
-        self.cursor = self.db.cursor()
-    
-    def make_all(self):
+        cursor = db.cursor()
         try:
-            self.cursor.execute(f"CREATE DATABASE {Config.DB_NAME}")
+            cursor.execute(f"CREATE DATABASE {Config.DB_NAME}")
         except:
             print("Database already exists")
         
         try:
-            self.cursor.execute("CREATE TABLE user_data (username VARCHAR(30), hash VARCHAR(64), salt VARCHAR(64))")
+            cursor.execute("CREATE TABLE user_data (username VARCHAR(30), hash VARCHAR(64), salt VARCHAR(64))")
         except:
             print("Tables already exist")
 
         print("Finished making")
-        self.db.database = Config.DB_NAME
-        self.db.commit()
+        db.database = Config.DB_NAME
+        db.commit()
+        cursor.close()
+        db.close()
 
     def get_user_data(self, username):
-        self.cursor.execute(f'SELECT * FROM user_data WHERE username = "{username}"')
-        result = self.cursor.fetchall()[0]
+        db, cursor = self.connect()
+        cursor.execute(f'SELECT * FROM user_data WHERE username = "{username}"')
+        result = cursor.fetchall()[0]
         out = {
             "username": result[0],
             "hash": result[1],
             "salt": result[2]
         }
 
+        cursor.close()
+        db.close()
         return out
     
     def does_username_exist(self, username):
-        self.cursor.execute(f'SELECT * FROM user_data WHERE username = "{username}"')
-        result = (len(self.cursor.fetchall()) > 0)
+        db, cursor = self.connect()
+        cursor.execute(f'SELECT * FROM user_data WHERE username = "{username}"')
+        result = (len(cursor.fetchall()) > 0)
+
+        cursor.close()
+        db.close()
         return result
     
     def insert_user_data(self, username, hash, salt):
-        self.cursor.execute(
+        db, cursor = self.connect()
+        cursor.execute(
             f'INSERT INTO user_data (username, hash, salt) VALUES("{username}", "{hash}", "{salt}")'
         )
-        self.db.commit()
+        db.commit()
+
+        cursor.close()
+        db.close()
 
     # used for testing remove this later
     def get_all_users(self):
-        self.cursor.execute(f"SELECT * FROM user_data")
-        return self.cursor.fetchall()
+        db, cursor = self.connect()
+        cursor.execute(f"SELECT * FROM user_data")
+        result = cursor.fetchall()
+        
+        cursor.close()
+        db.close()
+        return result

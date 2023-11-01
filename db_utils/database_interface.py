@@ -1,7 +1,4 @@
 class Database():
-    def __init__(self):
-        raise Exception("constructor not implemented")
-
     def make_all(self):
         raise Exception("interface method make_all not implemented")
 
