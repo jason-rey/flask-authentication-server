@@ -50,7 +50,7 @@ Registers a user
 
 **Request Body:**
 - `username` (string, required): The name of the user to be registered.
-- `password` (string, required): The value associated with the resource.
+- `password` (string, required): The user's password
 
 **Example Request:**
 ```javascript
