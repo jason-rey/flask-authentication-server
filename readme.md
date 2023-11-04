@@ -5,20 +5,11 @@ A token-based authentication api built using Flask and JWT
 **Currently hosted on http://34.127.30.181:5050/**
 
 ## Table of Contents
-
-- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
 
-## Features
-
-- Dockerized for easy deployment
-- Uses standard JWT tokens for authentication
-- Generic Database interface for easy implementation changes
-
 ## Installation
-
 1. Create .env file with the required variables shown in config.py
 2. Adjust exposed port in the Dockerfile to any desired one
 3. Build the Dockerfile and run it on your target system
