@@ -46,10 +46,8 @@ class LoginUser(Resource):
         tokenHoursToLive = 1
         expiryTimeStamp = datetime.now() + timedelta(hours=tokenHoursToLive)
         format = "%Y-%m-%d %H:%M:%S" 
-        ip = request.remote_addr
         data = {
             "username": username,
-            "ip": ip,
             "expiryTime": expiryTimeStamp.strftime(format)
         }
 

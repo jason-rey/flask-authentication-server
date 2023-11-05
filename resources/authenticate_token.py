@@ -48,8 +48,6 @@ class AuthenticateToken(Resource):
 
             userCredentials = {
                 "username": request.headers["username"],
-                "ip": request.remote_addr,
-                "port": request.environ["REMOTE_PORT"]
             }
             for field in data:
                 if field == "expiryTime":
