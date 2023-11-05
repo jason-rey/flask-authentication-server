@@ -1,8 +1,6 @@
 # RESTful Authentication API with Flask
 
 A token-based authentication api built using Flask and JWT
-<br>
-**Currently hosted on http://34.127.30.181:5050/**
 
 ## Table of Contents
 - [Installation](#installation)
