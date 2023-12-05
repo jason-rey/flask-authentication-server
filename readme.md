@@ -1,6 +1,6 @@
-# RESTful Authentication API with Flask
+# Authentication API
 
-A token-based authentication api built using Flask and JWT
+A token-based authentication api built using flask-restful and JWT
 
 ## Table of Contents
 - [Installation](#installation)
